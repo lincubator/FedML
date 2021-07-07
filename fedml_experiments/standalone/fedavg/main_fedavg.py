@@ -26,7 +26,7 @@ from fedml_api.model.cv.resnet import resnet56
 from fedml_api.model.cv.cnn import CNN_DropOut
 from fedml_api.data_preprocessing.FederatedEMNIST.data_loader import load_partition_data_federated_emnist
 from fedml_api.model.nlp.rnn import RNN_OriginalFedAvg, RNN_StackOverFlow
-from fedml_api.model.nlp.rnn import RNN_TimeSeries_FedAvg
+from fedml_api.model.rnn.time_series import RNN_TimeSeries_FedAvg
 
 from fedml_api.data_preprocessing.MNIST.data_loader import load_partition_data_mnist
 from fedml_api.model.linear.lr import LogisticRegression
