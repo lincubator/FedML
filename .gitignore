@@ -58,3 +58,11 @@ data/fednlp/*
 *.npz
 
 *.jpg
+
+*.tmp
+
+tmp/
+data/FederatedEMNIST/*
+data/fed_shakespeare/*
+data/energy_consumption/train
+data/energy_consumption/test

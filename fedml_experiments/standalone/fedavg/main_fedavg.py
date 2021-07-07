@@ -15,6 +15,7 @@ from fedml_api.data_preprocessing.cifar100.data_loader import load_partition_dat
 from fedml_api.data_preprocessing.cinic10.data_loader import load_partition_data_cinic10
 from fedml_api.data_preprocessing.fed_cifar100.data_loader import load_partition_data_federated_cifar100
 from fedml_api.data_preprocessing.shakespeare.data_loader import load_partition_data_shakespeare
+from fedml_api.data_preprocessing.energy_consumption.data_loader import load_partition_data_energy_consumption
 from fedml_api.data_preprocessing.fed_shakespeare.data_loader import load_partition_data_federated_shakespeare
 from fedml_api.data_preprocessing.stackoverflow_lr.data_loader import load_partition_data_federated_stackoverflow_lr
 from fedml_api.data_preprocessing.stackoverflow_nwp.data_loader import load_partition_data_federated_stackoverflow_nwp
@@ -25,6 +26,7 @@ from fedml_api.model.cv.resnet import resnet56
 from fedml_api.model.cv.cnn import CNN_DropOut
 from fedml_api.data_preprocessing.FederatedEMNIST.data_loader import load_partition_data_federated_emnist
 from fedml_api.model.nlp.rnn import RNN_OriginalFedAvg, RNN_StackOverFlow
+from fedml_api.model.nlp.rnn import RNN_TimeSeries_FedAvg
 
 from fedml_api.data_preprocessing.MNIST.data_loader import load_partition_data_mnist
 from fedml_api.model.linear.lr import LogisticRegression
@@ -32,6 +34,7 @@ from fedml_api.model.cv.resnet_gn import resnet18
 
 from fedml_api.standalone.fedavg.fedavg_api import FedAvgAPI
 from fedml_api.standalone.fedavg.my_model_trainer_classification import MyModelTrainer as MyModelTrainerCLS
+from fedml_api.standalone.fedavg.my_model_trainer_time_series import MyModelTrainer as MyModelTrainerTimeSeries
 from fedml_api.standalone.fedavg.my_model_trainer_nwp import MyModelTrainer as MyModelTrainerNWP
 from fedml_api.standalone.fedavg.my_model_trainer_tag_prediction import MyModelTrainer as MyModelTrainerTAG
 
@@ -126,6 +129,13 @@ def load_data(args, dataset_name):
         client_num, train_data_num, test_data_num, train_data_global, test_data_global, \
         train_data_local_num_dict, train_data_local_dict, test_data_local_dict, \
         class_num = load_partition_data_shakespeare(args.batch_size)
+        args.client_num_in_total = client_num
+
+    elif dataset_name == "energy_consumption":
+        logging.info("load_data. dataset_name = %s" % dataset_name)
+        client_num, train_data_num, test_data_num, train_data_global, test_data_global, \
+        train_data_local_num_dict, train_data_local_dict, test_data_local_dict, \
+        class_num = load_partition_data_energy_consumption(args.batch_size)
         args.client_num_in_total = client_num
 
     elif dataset_name == "fed_shakespeare":
@@ -250,6 +260,9 @@ def create_model(args, model_name, output_dim):
     elif model_name == "rnn" and args.dataset == "shakespeare":
         logging.info("RNN + shakespeare")
         model = RNN_OriginalFedAvg()
+    elif model_name == "rnn" and args.dataset == "energy_consumption":
+        logging.info("RNN + energy_consumption")
+        model = RNN_TimeSeries_FedAvg()
     elif model_name == "rnn" and args.dataset == "fed_shakespeare":
         logging.info("RNN + fed_shakespeare")
         model = RNN_OriginalFedAvg()
@@ -271,6 +284,8 @@ def custom_model_trainer(args, model):
         return MyModelTrainerTAG(model)
     elif args.dataset in ["fed_shakespeare", "stackoverflow_nwp"]:
         return MyModelTrainerNWP(model)
+    elif args.dataset in ["energy_consumption"]:
+        return MyModelTrainerTimeSeries(model)
     else: # default model trainer is for classification problem
         return MyModelTrainerCLS(model)
 
